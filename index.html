@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="《华为铁三角工作法》读书笔记的互动版：铁三角角色、LTC 流程、交付案例、技术项目经理现场交付清单。">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>铁三角交付手册</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky section nav over one reading column; diagrams (triangle, LTC flow) are the interactive anchors; role colors carry meaning site-wide */
+:root{
+  --bg:#EEF1F2; --surface:#FFFFFF; --ink:#16212A; --muted:#566571; --line:#D3DADF;
+  --steel:#24323D; --on-steel:#E9EEF1;
+  --ar:#2C69B0; --sr:#2C8460; --fr:#B9681A; --gate:#5B4BA8;
+  --font-display:"Noto Serif SC","Songti SC","STSong",serif;
+  --font-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11171B; --surface:#192127; --ink:#E4EAEE; --muted:#97A5B0; --line:#2B363E;
+  --steel:#0B1014; --on-steel:#DCE3E8;
+  --ar:#6FA4E4; --sr:#58BE91; --fr:#E6A050; --gate:#A495F0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11171B; --surface:#192127; --ink:#E4EAEE; --muted:#97A5B0; --line:#2B363E;
+  --steel:#0B1014; --on-steel:#DCE3E8;
+  --ar:#6FA4E4; --sr:#58BE91; --fr:#E6A050; --gate:#A495F0; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.75}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.3}
+p{margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px}
+.mono{font-family:var(--font-mono);letter-spacing:.04em}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gate);outline-offset:2px;border-radius:4px}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--steel);color:var(--on-steel)}
+.nav .wrap{display:flex;gap:4px;align-items:center;overflow-x:auto;scrollbar-width:none;padding-block:0}
+.nav .brand{font-family:var(--font-display);font-weight:900;margin-right:12px;white-space:nowrap;padding-block:12px}
+.nav a{color:var(--on-steel);text-decoration:none;opacity:.78;white-space:nowrap;padding:12px 10px;font-size:14px;border-bottom:2px solid transparent}
+.nav a:hover{opacity:1}
+.nav a.on{opacity:1;border-bottom-color:var(--fr)}
+
+section{padding-block:56px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.sec-head{display:grid;gap:8px;margin-bottom:28px;max-width:68ch}
+.sec-head h2{font-size:clamp(24px,3.4vw,32px)}
+.sec-head p{color:var(--muted)}
+
+/* hero */
+.hero{padding-block:44px 56px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:40px;align-items:start}
+.hero h1{font-size:clamp(34px,6vw,58px);font-weight:900;letter-spacing:.02em}
+.hero .lede{font-size:17px;color:var(--muted);margin-top:14px;max-width:34em}
+.source{margin-top:18px;font-size:13px;color:var(--muted);border-left:2px solid var(--line);padding-left:12px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:22px;font-size:13px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+/* triangle */
+.tri-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.tri-svg{width:100%;max-width:420px;display:block;margin:0 auto}
+.tri-svg .edge{stroke:var(--line);stroke-width:3}
+.tri-svg .node{cursor:pointer}
+.tri-svg .node circle{stroke-width:3;transition:r .2s}
+.tri-svg .node text{font-family:var(--font-body);font-weight:700;font-size:15px}
+.tri-svg .node .sub{font-weight:500;font-size:11px;font-family:var(--font-mono)}
+.tri-svg .node.on circle{r:44}
+.tri-svg .center{cursor:pointer}
+.tri-hint{text-align:center;font-size:12px;color:var(--muted);margin-top:4px}
+
+.role-panel{margin-top:16px;border-top:1px solid var(--line);padding-top:16px;display:grid;gap:14px}
+.role-panel h3{font-size:22px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.tag{font-family:var(--font-mono);font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.role-panel .soft{color:var(--muted)}
+.model{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.model li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:8px;align-items:baseline}
+.model b.k{font-family:var(--font-mono);font-size:13px;text-align:center;border-radius:4px;padding:1px 0}
+.cols2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mini h4{margin:0 0 4px;font-size:13px;color:var(--muted);font-weight:500}
+.mini ul{margin:0;padding-left:18px}
+
+/* LTC */
+.flow{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:6px}
+.stage{flex:1 1 0;min-width:190px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;text-align:left;display:grid;gap:8px;align-content:start}
+.stage:hover{border-color:var(--muted)}
+.stage.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.stage .n{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.stage h3{font-size:19px}
+.stage .who{display:grid;gap:4px;font-size:12px}
+.bar{display:grid;grid-template-columns:52px minmax(0,1fr);align-items:center;gap:6px}
+.bar i{display:block;height:6px;border-radius:3px}
+.gates{display:flex;flex-direction:column;justify-content:center;gap:10px;padding-inline:8px;flex:0 0 auto}
+.gate{display:grid;justify-items:center;gap:4px;cursor:pointer;background:none;border:0;padding:4px}
+.gate .d{width:20px;height:20px;transform:rotate(45deg);border:2px solid var(--gate);background:var(--surface)}
+.gate.on .d{background:var(--gate)}
+.gate span{font-size:12px;color:var(--gate);font-weight:700;white-space:nowrap}
+.ltc-detail{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:12px}
+.ltc-detail h3{font-size:20px}
+.note{font-size:13px;color:var(--muted)}
+
+/* cases */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:5px 14px;cursor:pointer;font-size:14px}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cases{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.case{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.case .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted)}
+.case h3{font-size:18px}
+.case .src{font-family:var(--font-mono);font-size:11px}
+.case details summary{cursor:pointer;color:var(--muted);font-size:13px}
+.case dl{margin:8px 0 0;display:grid;gap:6px}
+.case dt{font-size:12px;color:var(--muted)}
+.case dd{margin:0}
+.case .use{border-top:1px dashed var(--line);padding-top:8px}
+.case .use b{color:var(--fr)}
+
+/* TPM */
+.powers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:28px}
+.power{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--fr);border-radius:10px;padding:12px 14px}
+.power b{display:block;font-size:15px}
+.power span{font-size:13px;color:var(--muted)}
+.tpm{display:grid;grid-template-columns:240px minmax(0,1fr);gap:20px;align-items:start}
+.steps{display:grid;gap:4px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 60px)}
+.step-btn{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;align-items:center;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:8px 10px;cursor:pointer}
+.step-btn:hover{background:var(--surface)}
+.step-btn.on{background:var(--surface);border-color:var(--line)}
+.step-btn .no{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.step-btn .pg{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.step-btn .pg.done{color:var(--sr)}
+.step-body{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:14px;min-width:0}
+.step-body h3{font-size:22px}
+.step-body .when{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.checks label{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start;cursor:pointer;padding:4px 6px;border-radius:6px}
+.checks label:hover{background:color-mix(in srgb,var(--line) 40%,transparent)}
+.checks input{margin-top:6px;accent-color:var(--sr);width:16px;height:16px}
+.checks input:checked + span{color:var(--muted);text-decoration:line-through}
+.tip{border-left:3px solid var(--fr);padding:8px 12px;background:color-mix(in srgb,var(--fr) 9%,transparent);border-radius:0 8px 8px 0;font-size:14px}
+.rhythm{width:100%;border-collapse:collapse;font-size:14px}
+.rhythm th,.rhythm td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.rhythm th{font-size:12px;color:var(--muted);font-weight:500}
+.reset{justify-self:start;background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:13px;color:var(--muted);cursor:pointer}
+
+.fix{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:28px}
+.fix > div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.fix .n{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.fix h4{margin:2px 0 6px;font-size:16px}
+.fix p{font-size:14px}
+.pits{margin-top:24px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px;padding:0;list-style:none}
+.pits li{display:grid;grid-template-columns:22px minmax(0,1fr);font-size:14px}
+.pits li::before{content:"✕";color:var(--fr);font-weight:700}
+h3.sub{font-size:20px;margin-top:36px;margin-bottom:12px}
+
+/* story */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;padding:3px;background:var(--surface);margin-bottom:18px}
+.seg button{border:0;background:none;border-radius:99px;padding:6px 18px;cursor:pointer}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.story-bg{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px;font-size:14px;display:grid;gap:6px}
+.points{display:grid;gap:10px}
+.point{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.point b{font-family:var(--font-display);font-size:16px}
+.point.before{border-left:3px solid var(--muted)}
+.point.after{border-left:3px solid var(--sr)}
+.timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.timeline div{border-top:2px solid var(--sr);padding-top:8px;font-size:14px}
+.timeline .mono{font-size:12px;color:var(--sr)}
+
+/* questions */
+.qs{counter-reset:q;list-style:none;margin:0;padding:0;display:grid;gap:10px;max-width:72ch}
+.qs li{counter-increment:q;display:grid;grid-template-columns:36px minmax(0,1fr);gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.qs li::before{content:counter(q,decimal-leading-zero);font-family:var(--font-mono);color:var(--muted);font-size:13px;padding-top:2px}
+.copy{margin-top:14px;background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:8px 16px;cursor:pointer}
+.copy-msg{margin-left:10px;font-size:13px;color:var(--sr)}
+footer{padding-block:28px 40px;color:var(--muted);font-size:13px}
+
+@media (max-width:860px){
+  .hero-grid{grid-template-columns:minmax(0,1fr)}
+  .tpm{grid-template-columns:minmax(0,1fr)}
+  .steps{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .powers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fix{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:620px){
+  .cols2,.pits,.timeline{grid-template-columns:minmax(0,1fr)}
+  .point{grid-template-columns:minmax(0,1fr);gap:4px}
+  .flow{flex-direction:column}
+  .stage{min-width:0}
+  .gates{flex-direction:row;justify-content:center;padding-block:8px}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  section{padding-block:40px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+section[id]{scroll-margin-top:52px}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="章节">
+  <div class="wrap">
+    <span class="brand">铁三角交付手册</span>
+    <a href="#roles">三个角色</a>
+    <a href="#ltc">LTC 流程</a>
+    <a href="#cases">案例库</a>
+    <a href="#tpm">现场交付</a>
+    <a href="#story">示例</a>
+    <a href="#talk">讨论</a>
+  </div>
+</nav>
+
+<section class="hero" id="roles">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">读书笔记 · 软件交付视角</div>
+      <h1>三个人围着客户，<br>对一个结果负责</h1>
+      <p class="lede">华为的铁三角是：客户经理、方案经理、交付经理组成一个小团队，从发现机会一直负责到钱收回来。这里把书里的做法换成软件项目交付的大白话，方便讨论。</p>
+      <p class="source">整理自《华为铁三角工作法》，范厚华著，中信出版集团。本页为读书笔记与应用整理，内容经过改写，不是原书文字。</p>
+      <div class="legend" aria-label="颜色说明">
+        <span><i class="dot" style="background:var(--ar)"></i>客户经理（AR）</span>
+        <span><i class="dot" style="background:var(--sr)"></i>方案经理（SR）</span>
+        <span><i class="dot" style="background:var(--fr)"></i>交付经理（FR）</span>
+        <span><i class="dot" style="background:var(--gate);border-radius:2px"></i>决策关口</span>
+      </div>
+    </div>
+    <div class="tri-box">
+      <svg class="tri-svg" viewBox="0 0 360 310" role="group" aria-label="铁三角角色图，点击角色查看详情">
+        <line class="edge" x1="180" y1="58" x2="62" y2="246"/>
+        <line class="edge" x1="180" y1="58" x2="298" y2="246"/>
+        <line class="edge" x1="62" y1="246" x2="298" y2="246"/>
+        <g class="center" data-role="core" tabindex="0" role="button" aria-label="共同目标">
+          <circle cx="180" cy="180" r="40" style="fill:var(--bg);stroke:var(--ink)" stroke-width="2" stroke-dasharray="4 4"/>
+          <text x="180" y="176" text-anchor="middle" style="fill:var(--ink);font-family:var(--font-display)" font-weight="700" font-size="16">客户</text>
+          <text x="180" y="196" text-anchor="middle" style="fill:var(--muted)" font-size="11">共同目标</text>
+        </g>
+        <g class="node" data-role="ar" tabindex="0" role="button" aria-label="客户经理">
+          <circle cx="180" cy="58" r="38" style="fill:var(--surface);stroke:var(--ar)"/>
+          <text x="180" y="56" text-anchor="middle" style="fill:var(--ar)">客户经理</text>
+          <text class="sub" x="180" y="74" text-anchor="middle" style="fill:var(--muted)">AR</text>
+        </g>
+        <g class="node" data-role="sr" tabindex="0" role="button" aria-label="方案经理">
+          <circle cx="62" cy="246" r="38" style="fill:var(--surface);stroke:var(--sr)"/>
+          <text x="62" y="244" text-anchor="middle" style="fill:var(--sr)">方案经理</text>
+          <text class="sub" x="62" y="262" text-anchor="middle" style="fill:var(--muted)">SR</text>
+        </g>
+        <g class="node" data-role="fr" tabindex="0" role="button" aria-label="交付经理">
+          <circle cx="298" cy="246" r="38" style="fill:var(--surface);stroke:var(--fr)"/>
+          <text x="298" y="244" text-anchor="middle" style="fill:var(--fr)">交付经理</text>
+          <text class="sub" x="298" y="262" text-anchor="middle" style="fill:var(--muted)">FR</text>
+        </g>
+      </svg>
+      <p class="tri-hint">点击三个角色或中间的"客户"</p>
+      <div class="role-panel" id="rolePanel" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<section id="ltc">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Lead To Cash · 从线索到回款</div>
+      <h2>一单生意从头到尾，用一条流程管起来</h2>
+      <p>三段主流程，中间设五个决策关口。每段下面的色条表示三个角色在这一段投入的多少。点击阶段或关口查看详情。</p>
+    </div>
+    <div class="flow" id="flow"></div>
+    <div class="ltc-detail" id="ltcDetail" aria-live="polite"></div>
+  </div>
+</section>
+
+<section id="cases">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">案例库</div>
+      <h2>书里跟交付有关的案例</h2>
+      <p>按主题筛选。每个案例都附了一句"放到软件项目里怎么用"。标"咨询"的是作者做咨询时碰到的其他公司。</p>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="按主题筛选"></div>
+    <div class="cases" id="caseList"></div>
+  </div>
+</section>
+
+<section id="tpm">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">技术项目经理 = 软件项目里的交付经理</div>
+      <h2>现场交付：从进场到收尾</h2>
+      <p>技术项目经理是项目交付的第一责任人，不是跨组协调员。左边选步骤，右边的清单可以打勾，进度只保存在你自己的浏览器里。</p>
+    </div>
+    <div class="powers">
+      <div class="power"><b>调人的权</b><span>项目要谁，直接跟对应组的领导要</span></div>
+      <div class="power"><b>评价的权</b><span>项目成员的表现算进绩效和奖金</span></div>
+      <div class="power"><b>往上找的通道</b><span>卡住了直接找能拍板的人</span></div>
+      <div class="power"><b>签合同前的发言权</b><span>报价和承诺先过他这一关</span></div>
+    </div>
+    <div class="tpm">
+      <div class="steps" id="steps" role="tablist" aria-label="交付步骤"></div>
+      <div class="step-body" id="stepBody" role="tabpanel"></div>
+    </div>
+
+    <h3 class="sub">已经乱了的项目，一周内理顺</h3>
+    <div class="fix">
+      <div><span class="n">第 1 步 · 2～3 天</span><h4>摸底</h4><p>盘清四件事：答应过客户什么、实际做到哪、有哪些问题、手上有哪些人。分别找客户负责人、使用部门、我方骨干单独聊，把所有问题收进一张清单。</p></div>
+      <div><span class="n">第 2 步 · 1～2 天</span><h4>重新对齐</h4><p>内部先统一：哪些能做、哪些做不了、哪天能上线。再找客户领导开会重新确认目标和优先级，做不到的坦白讲并给替代方案，结论书面发给双方。</p></div>
+      <div><span class="n">第 3 步 · 马上</span><h4>立规矩</h4><p>恢复每天碰头、每周演示和周报；先稳住客户试用的系统；问题清单每天更新；把四项权力要到位。客户有事先找技术项目经理，而不是直接投诉，就算理顺了。</p></div>
+    </div>
+
+    <h3 class="sub">现场交付最常见的 6 个坑</h3>
+    <ul class="pits">
+      <li>销售口头承诺的事没交接，到现场客户问起才知道</li>
+      <li>启动会只请了客户领导，真正用系统、管系统的人没来</li>
+      <li>客户口头提的改动随手就改，没有记录，验收说不清</li>
+      <li>客户试用的系统被我方更新频繁打断，信心越来越差</li>
+      <li>客户该准备的东西干等着，最后算成我们延期</li>
+      <li>上线前没演练、没退路，上线当天手忙脚乱</li>
+    </ul>
+  </div>
+</section>
+
+<section id="story">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">示例 · 虚构场景</div>
+      <h2>一个快要失控的跨团队项目</h2>
+      <p>切换"处理前"和"处理后"，对照看五个要点怎么落地。</p>
+    </div>
+    <div class="story-bg">
+      <p><b>背景：</b>合同约定 6 月 30 日上线，客户验收后付最后 40% 的钱。平台组（登录、权限）、业务组（审批、工单）、数据组（报表、同步）三个组一起做，实施组负责安装和培训。</p>
+      <p>离上线还剩 4 周，客户负责人打电话给销售："你们到底有没有人管？"</p>
+    </div>
+    <div class="seg" role="tablist" aria-label="处理前后">
+      <button id="segBefore" role="tab" aria-selected="false">处理前</button>
+      <button id="segAfter" class="on" role="tab" aria-selected="true">处理后</button>
+    </div>
+    <div class="points" id="points"></div>
+    <div class="timeline" id="timeline">
+      <div><span class="mono">第 1 周</span><p>客户试用的系统不再三天两头打不开；三个组的对接方式定死了。</p></div>
+      <div><span class="mono">第 2 周</span><p>每天拼一次，从老是失败变成基本都能跑通，问题越来越少。</p></div>
+      <div><span class="mono">第 4 周</span><p>按时上线，一个月后验收通过，钱收回来了。客户说：以前跟三拨人打交道，现在只跟一个团队。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="talk">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">讨论</div>
+      <h2>拿去开会问的七个问题</h2>
+      <p>跨团队交付不了，很少是因为技术不行，多数是因为没有一个人、一个团队对最终结果负责。</p>
+    </div>
+    <ol class="qs" id="qs"></ol>
+    <button class="copy" id="copyBtn">复制全部问题</button><span class="copy-msg" id="copyMsg" aria-live="polite"></span>
+  </div>
+</section>
+
+<footer><div class="wrap">资料来源：《华为铁三角工作法》（范厚华，中信出版集团）。本页是个人读书笔记，案例均为概括改写；"示例"部分为虚构场景。</div></footer>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- roles ---------- */
+const ROLES={
+ ar:{name:"客户经理",code:"AR",color:"var(--ar)",soft:"销售 / 客户负责人",
+  one:"离客户最近的人。代表客户向公司提要求，并对整单生意负责到回款。",
+  modelName:"四种角色",
+  model:[["S","销售项目的主导者：定目标、组团队、管项目进展和竞争"],["A","客户关系的建立者：从个人关系做到组织层面的关系"],["L","全流程交易质量的责任者：从机会点到合同到回款都要管"],["E","客户群规划的制订者：理解客户战略，制定目标和打法"]],
+  kpi:["销售目标","回款","客户满意度"],
+  todo:["销售口头答应的事，交接时全部讲清楚","把客户的使用部门、运维部门早早拉进来","牵头开合同交接会","验收后推动开票、把钱收回来"]},
+ sr:{name:"方案经理",code:"SR",color:"var(--sr)",soft:"售前 / 架构师",
+  one:"从客户的痛点出发设计方案，靠差异化取胜，而不是拼价格。",
+  modelName:"5P 模型",
+  model:[["P","Plan 市场规划：看清市场，做中长期预测"],["P","Place 找机会点：找到突破口，管好产品布局"],["P","Product 客户化方案：按客户情况定制产品和方案"],["P","Promotion 价值传播：让客户关键人理解并认可方案价值"],["P","Profit 守住利润：定价、竞争策略，把好合同质量"]],
+  kpi:["销售目标","产品市场份额"],
+  todo:["先定整体方案和各组之间怎么对接","确保报出去的方案交付得了","问出客户真实的需求，而不是照单全收","参与合同评审，守住利润"]},
+ fr:{name:"交付经理",code:"FR",color:"var(--fr)",soft:"技术项目经理 / 交付负责人",
+  one:"签合同以后的第一责任人。售前就要介入，约束对客户的承诺，做不到的事不写进合同。",
+  modelName:"HEROS 模型",
+  model:[["H","Head 交付团队的领导者：带出一支能打的团队"],["E","Environment 交付环境的营造者：守规矩、营造好氛围"],["R","Responsibility 结果责任人：按合同交付、按预算执行，对经营、质量和客户满意负责"],["O","Operation 风险管控者：重大风险要决策，管不了的及时往上报"],["S","Strategy 交付方案制订者：定交付策略和方案，并管好执行"]],
+  kpi:["收入达成","成本控制","按合同履行：质量、时间、预算"],
+  todo:["报价阶段就参与，判断能不能做、要多久","集中资源，定好每天、每周的节奏","把关需求改动，所有改动留记录","推验收，配合收钱，最后做复盘"]},
+ core:{name:"共同目标",code:"客户",color:"var(--ink)",soft:"三个人一起拿、一起扛",
+  one:"铁三角不是三方互相牵制，而是绑在一起、围着客户需求打仗的一个作战单元。",
+  modelName:"让三个人真正绑在一起的做法",
+  model:[["1","一个共同目标：今年拿多少订单、多少收入、收回多少钱"],["2","一个共同奖金包：按目标完成情况分，不按各自部门拿提成"],["3","考核结构（书中示例）：关键财务指标 70%、关键举措 20%、团队合作 10%、个人成长加分"],["4","给一线授权：书中建议 60%～80% 的决策在一线完成"]],
+  kpi:["收入","利润","现金流","客户满意度"],
+  todo:["只凑齐三个人、各拿各的奖金，不算铁三角","订单拿不下来大家都没收入，才会主动补位","项目砸了，项目经理第一个担责，其他人也受影响"]}
+};
+function renderRole(k){
+  const r=ROLES[k];
+  document.querySelectorAll(".tri-svg [data-role]").forEach(g=>{g.classList.toggle("on",g.dataset.role===k);g.setAttribute("aria-pressed",g.dataset.role===k)});
+  $("#rolePanel").innerHTML=`
+   <h3 style="color:${r.color}">${esc(r.name)} <span class="tag">${esc(r.code)}</span><span class="tag" style="color:var(--muted)">软件项目里：${esc(r.soft)}</span></h3>
+   <p>${esc(r.one)}</p>
+   <div><div class="mini"><h4>${esc(r.modelName)}</h4></div>
+   <ul class="model">${r.model.map(m=>`<li><b class="k" style="color:${r.color};background:color-mix(in srgb,${r.color} 12%,transparent)">${esc(m[0])}</b><span>${esc(m[1])}</span></li>`).join("")}</ul></div>
+   <div class="cols2">
+    <div class="mini"><h4>考核看什么</h4><ul>${r.kpi.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+    <div class="mini"><h4>${k==="core"?"要点":"在软件项目里要做的事"}</h4><ul>${r.todo.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+   </div>`;
+}
+document.querySelectorAll(".tri-svg [data-role]").forEach(g=>{
+  g.addEventListener("click",()=>renderRole(g.dataset.role));
+  g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();renderRole(g.dataset.role)}});
+});
+renderRole("fr");
+
+/* ---------- LTC ---------- */
+const LTC=[
+ {type:"stage",id:"lead",n:"阶段 1",name:"管理线索",lv:[3,1,1],lead:"客户经理",
+  what:["收集、验证、培育线索","主动去挖，不要等客户找上门","有价值的线索出现在客户招标之前"],
+  soft:"发现商机：去客户那里看他们现在怎么干活、哪里痛。",why:"自己挖出来的线索才是第一手的；等招标公告出来，往往已经晚了。"},
+ {type:"gates",items:[{id:"g1",name:"立项",what:"这个机会值不值得投入？看客户需求、预算、交付时间、决策链，以及我们有没有匹配的方案，并定项目级别。",soft:"这个商机要不要正式投人做售前。"}]},
+ {type:"stage",id:"opp",n:"阶段 2",name:"管理机会点",lv:[3,3,2],lead:"客户经理 + 方案经理",
+  what:["立项、做方案、投标、谈判、签合同","交付经理在这时就要参与，保证方案交付得了","书里的说法：大部分结果在发标前就决定了"],
+  soft:"售前：演示、试点、报价、谈合同。",why:"承诺都是在这一段做出去的，交付做不到的事不能写进合同。"},
+ {type:"gates",items:[
+   {id:"g2",name:"投标",what:"标书能不能交出去？先由方案、交付、财经、商务法务四个方面分别评审，再综合评审，最后由决策团队拍板。",soft:"报价单和方案发给客户之前，交付和研发要过一遍。"},
+   {id:"g3",name:"签约",what:"合同能不能签？目标是四条：合理利润、正现金流、风险可控、客户满意。评审和决策分开，评审负责把风险讲清楚。",soft:"合同范围、验收标准、付款节点都要交付的人看过。"}]},
+ {type:"stage",id:"exec",n:"阶段 3",name:"管理合同执行",lv:[2,1,3],lead:"交付经理",
+  what:["开合同交接会，把合同和承诺交接清楚","管交付过程，让进度对客户可见","交付节点触发开票，跟付款条款挂钩","管变更、管风险和争议，最后关闭合同"],
+  soft:"实施交付、验收、开票收钱、结项复盘。",why:"签合同只是开始，钱收回来、客户满意才算结束。"},
+ {type:"gates",items:[
+   {id:"g4",name:"变更",what:"合同能不能改？评估风险、成本、技术方案和工期，认定是谁的责任。只有有授权的人才能签改动；特别紧急时可以先做，事后补手续。",soft:"客户提需求改动：先记录、评估，再定改不改，书面确认。"},
+   {id:"g5",name:"关闭",what:"合同能不能关？看执行情况、利润结果、遗留风险和客户满意度。",soft:"结项复盘：答应的做到了多少，赚了还是亏了。"}]}
+];
+const LV=["","少","中","多"];
+function renderFlow(){
+  $("#flow").innerHTML=LTC.map(b=>{
+    if(b.type==="stage") return `<button class="stage" data-id="${b.id}"><span class="n mono">${b.n}</span><h3>${b.name}</h3><span class="note">主导：${b.lead}</span>
+      <span class="who">${[["客户经理","--ar"],["方案经理","--sr"],["交付经理","--fr"]].map((r,i)=>`<span class="bar"><span>${r[0].slice(0,2)}·${LV[b.lv[i]]}</span><i style="width:${b.lv[i]*33}%;background:var(${r[1]})"></i></span>`).join("")}</span></button>`;
+    return `<div class="gates">${b.items.map(g=>`<button class="gate" data-id="${g.id}" aria-label="决策关口：${g.name}"><i class="d"></i><span>${g.name}</span></button>`).join("")}</div>`;
+  }).join("");
+  document.querySelectorAll("#flow [data-id]").forEach(el=>el.addEventListener("click",()=>showLtc(el.dataset.id)));
+}
+function findLtc(id){for(const b of LTC){if(b.type==="stage"&&b.id===id)return{k:"stage",d:b};if(b.type==="gates"){const g=b.items.find(x=>x.id===id);if(g)return{k:"gate",d:g}}}}
+function showLtc(id){
+  document.querySelectorAll("#flow [data-id]").forEach(el=>el.classList.toggle("on",el.dataset.id===id));
+  const f=findLtc(id),d=f.d;
+  $("#ltcDetail").innerHTML=f.k==="stage"
+   ?`<span class="eyebrow">${d.n} · 主导：${d.lead}</span><h3>${d.name}</h3><ul style="margin:0;padding-left:18px">${d.what.map(x=>`<li>${x}</li>`).join("")}</ul><p><b>放到软件项目：</b>${d.soft}</p><p class="tip">${d.why}</p>`
+   :`<span class="eyebrow" style="color:var(--gate)">决策关口</span><h3 style="color:var(--gate)">${d.name}决策</h3><p>${d.what}</p><p><b>放到软件项目：</b>${d.soft}</p><p class="note">书中提到，决策由各级销售决策团队按授权进行，大部分决策应在一线层级完成，超出授权的逐级上报。</p>`;
+}
+renderFlow();showLtc("exec");
+
+/* ---------- cases ---------- */
+const TAGS=["集中资源","打通协同","每个环节做对","对结果负责","紧迫感","改动留痕"];
+const CASES=[
+ {t:"苏丹投标失败",y:"2006",src:"华为",tags:["打通协同","集中资源"],what:"开客户的会去了七八个人，每人只讲自己那块产品。客户要的是一张能运营的网。客户在沙漠，最在乎油电成本，前端早知道却没传给做方案的人，竞争对手给了太阳能方案。",fix:"任命客户、方案、交付三个负责人一起管这个客户，交付的人报价阶段就参与。三人一起见客户、一起办公，这是第一个铁三角。",use:"客户面对的应该是一个团队，不是几个组各说各的；交付在报价时就要参与。"},
+ {t:"凌晨一点半调来专家",y:"",src:"华为",tags:["集中资源","紧迫感"],what:"代理商第二天早上要重新讲技术方案，半夜还拿不出东西，凌晨一点半打电话求助。",fix:"销售直接联系同一团队的技术专家，半小时内给答复，专家坐早班飞机赶到，最后拿下项目。换成常规做法要层层找领导，至少七次沟通。",use:"同一个项目团队里，需要谁就直接找谁，不走层层审批。"},
+ {t:"\"发正确的货部\"",y:"2003 前后",src:"华为",tags:["每个环节做对"],what:"海外订单激增，错发、漏发频繁，客户心里大大失分。华为专门成立了一个部门，名字就叫\"发正确的货部\"。",fix:"任正非要求：理解需求、做合同、录合同、发货、交付、服务，每个环节都要做对。",use:"质量不只是测试的事。需求理解错、合同写错、配置错，后面再努力也是返工。"},
+ {t:"巴基斯坦交钥匙工程",y:"2005–2006",src:"华为",tags:["集中资源","每个环节做对"],what:"第一次做从土建到开通的全包项目，没有经验，连管土建、管外包、算账的人都没配，摸黑干，亏了很多钱。",fix:"成立专门部门；按项目大小和难度配人；让懂行的专家说了算，不靠领导拍脑袋。",use:"接一种没做过的项目（比如第一次私有化部署），先把角色配齐，不拿原班子硬上。"},
+ {t:"马来西亚电信投诉",y:"2010",src:"华为",tags:["紧迫感","对结果负责"],what:"客户 CEO 写正式投诉信给华为董事长，指出不按合同交付、项目管理混乱、派不出好专家。信发出 5 天，没人出来解决，大家在想怎么回邮件不担责任。",fix:"董事长回国后亲自介入、调资源解决。之后从高层到一线花一年时间自我反思，出了一批新做法和干部，经验推广到全球。",use:"客户投诉先解决问题，不先写免责回复；客户高层投诉说明问题已很普遍；事后要真复盘。"},
+ {t:"中东某国清关",y:"2008",src:"华为",tags:["对结果负责"],what:"合同约定客户自己清关，结果每批货在首都清关要 45 天左右，工程一直拖。按合同这是客户的责任。",fix:"华为物流员工主动调研，找到一个清关约 10 天的沿海港口，从港口到站点 15 天以内，建议客户改交货地点，整体省了约一个月。",use:"客户的服务器、账号、对方接口没准备好，不能当延期的理由，要提前去推、去帮。"},
+ {t:"荣耀销毁一批手机",y:"2015",src:"华为",tags:["对结果负责","每个环节做对"],what:"运输途中货车轮胎起火，一批手机受了高温。检测 96% 以上合格。",fix:"仍把这批价值 2200 万元的手机全部销毁，避免约 4% 的手机一两年后出问题。",use:"已知有严重隐患的版本宁可不发。客户碰到一次大问题，就会怀疑整个系统。"},
+ {t:"只搞定了采购部",y:"",src:"华为",tags:["打通协同","对结果负责"],what:"靠跟采购高层的关系和优惠价格拿下项目。设备到了才发现机房不具备安装条件；装好后运维部门拒签验收，把小问题放大告到高层。",fix:"教训是客户界面缺乏协同：只跟采购打交道，没跟运维等部门沟通。",use:"签合同的人和验收的人往往不是一拨人。使用部门、运维部门从一开始就拉进来。"},
+ {t:"方案被改来改去说不清",y:"",src:"华为",tags:["改动留痕"],what:"交付后客户质量部门判不合格。原来客户技术部门有人改过方案，没通知质量部和采购部；还有改了又改回来的。双方都拿不出证据，闹到打官司。",fix:"合同执行中实时跟踪状态，变更全部留痕，风险跟到关闭为止。",use:"客户口头提的改动必须书面确认、集中登记，否则验收就是一笔糊涂账。"},
+ {t:"LTC 变革的起因",y:"2005 以后",src:"华为",tags:["打通协同"],what:"拿下全球大客户后订单暴增，满意度反而下降。一线说后方老掉链子，后方说一线签的合同太烂；错发漏发、二次开发、工程队闲着等料。",fix:"用 LTC 把线索、机会点、合同执行串成一条流程，打通售前和售后。",use:"销售和交付互相埋怨，说明问题出在流程上，不是哪个人不行。"},
+ {t:"三个子产品自己对接不通",y:"",src:"咨询",tags:["打通协同"],what:"一个新产品由三个子产品组成，三拨研发从没一起开过会。客户问：为什么跟别家对接没问题，你们自家设备之间反而不通？老板说很多事要从客户嘴里才知道。",fix:"作者直言这是交付在偷懒：5 年过去客户和需求都变了，交付方法和工具没变。",use:"几个组拼起来交付，必须有人对整体负责，并经常把各组的东西放到一起试。"},
+ {t:"一圈人互相甩锅",y:"",src:"咨询",tags:["打通协同","紧迫感"],what:"订单延误半年。销售怪生产，研发怪销售，生产怪采购，采购怪财务，财务怪库存，正好绕成一个圈。",fix:"每个部门都有理由，根子是缺一套让大家一起面向客户的协作机制。",use:"别问\"这是谁的问题\"，先问\"谁对客户这个结果负责\"。"},
+ {t:"凑齐三个人≠铁三角",y:"",src:"咨询",tags:["对结果负责"],what:"一家电力工程企业学完课：销售拿单有提成，工程做完有奖金，办牌照的有奖励，以为这就是铁三角。",fix:"作者说这不是铁三角。真正的铁三角只有一个共同目标和一个奖金包，拿不下单大家都没收入，才会主动补位。",use:"技术项目经理、销售、各组骨干的奖金跟同一个项目结果挂钩。"}
+];
+let curTag=store.get("tsj-tag","全部");
+function renderChips(){
+  $("#chips").innerHTML=["全部",...TAGS].map(t=>`<button class="chip${t===curTag?" on":""}" aria-pressed="${t===curTag}" data-t="${t}">${t}</button>`).join("");
+  document.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{curTag=b.dataset.t;store.set("tsj-tag",curTag);renderChips();renderCases()}));
+}
+function renderCases(){
+  const list=CASES.filter(c=>curTag==="全部"||c.tags.includes(curTag));
+  $("#caseList").innerHTML=list.map(c=>`<article class="case">
+    <div class="meta"><span class="src tag" style="color:${c.src==="咨询"?"var(--gate)":"var(--muted)"}">${c.src}</span>${c.y?`<span class="mono">${c.y}</span>`:""}${c.tags.map(t=>`<span>#${t}</span>`).join("")}</div>
+    <h3>${esc(c.t)}</h3>
+    <p class="use"><b>软件项目里：</b>${esc(c.use)}</p>
+    <details><summary>发生了什么、怎么解决</summary><dl><dt>发生了什么</dt><dd>${esc(c.what)}</dd><dt>怎么解决 / 结论</dt><dd>${esc(c.fix)}</dd></dl></details>
+  </article>`).join("");
+}
+renderChips();renderCases();
+
+/* ---------- TPM steps ---------- */
+const STEPS=[
+ {id:"s0",name:"进场前准备",when:"签合同后 1～2 周",goal:"人还没到现场，心里先有数。",checks:["开内部交接会：销售牵头，技术项目经理必须到","列范围清单：合同里到底要交付什么","列承诺清单：销售口头答应过客户的事","问清验收标准，以及由谁签字","对上付款节点和付款条件","记下售前阶段已发现的风险","定人：各组派谁、何时到位、是否全职","给客户发准备清单：服务器、网络、账号、场地、要对接的系统和负责人","跟客户约定这些准备的完成日期"],tip:"客户要准备的东西进场前就提，不要人到了现场才发现服务器还没批下来。"},
+ {id:"s1",name:"启动会",when:"到现场第一周",goal:"双方对做什么、哪天做完、怎么配合达成一致，并留下书面记录。",checks:["请到客户领导和项目负责人","请到实际使用系统的部门","请到客户运维或 IT 部门","讲清目标和上线日期","双方联系人表：每件事找谁","大节点计划：每个节点交付什么","沟通方式：每天、每周怎么同步，出问题找谁","需求改动规则：走什么步骤、谁拍板","验收标准和签字人","需要客户配合的事和完成日期","会议纪要发双方领导，并请客户负责人回复确认"],tip:"只请采购或只请 IT 不够。将来签字验收的人，启动会就要在场。"},
+ {id:"s2",name:"现场确认需求",when:"第 1～3 周",goal:"把合同上的几行字，变成双方签过字的需求清单。",checks:["到使用部门现场看他们现在怎么干活","追问背后的真实需求，不照单全收","需求清单请客户签字确认","超出合同的部分当场标出，走改动流程"],tip:"书里的例子：客户说电话线要 10 米长，其实是想拿着电话满屋走，后来做出了无绳电话。"},
+ {id:"s3",name:"实施推进",when:"主体阶段",goal:"每天往前走一步，问题不过夜，进度让客户看得见。",rhythm:[["每天","15 分钟碰头：昨天解决了什么、今天解决什么、卡在哪"],["每天","各组的东西拼到一起试一次，拼不通当天解决"],["每周","给客户演示一次新进展"],["每周","周报发给客户和我方领导：完成、计划、问题、要谁帮忙"],["每两周","跟客户领导碰一次，解决卡住的事"]],checks:["系统分开用：自己组一套、拼起来试一套、客户试用一套、正式一套","客户试用的那套只在每周固定时间更新","所有问题放一张清单，每条有负责人和截止日期","卡了半天没解决，直接找对应组领导或客户负责人","客户问题 2 小时内回复，24 小时内给办法或临时绕过方案"],tip:"客户试用的那套系统必须稳定。客户每次打开都是坏的，说什么都没用。"},
+ {id:"s4",name:"需求改动把关",when:"随时",goal:"每个改动都有记录、有评估、有确认。",checks:["记下来：谁、什么时候、要改什么","评估：多花多少人力和时间，影不影响上线，在不在合同里","小改动技术项目经理定；影响工期或费用的，拉销售跟客户谈","书面确认，集中登记一处，验收时拿得出来"],tip:"只有授权的人能答应改合同。现场研发不能私下答应客户的改动。"},
+ {id:"s5",name:"上线",when:"上线前后",goal:"一次上成功，出问题能马上退回去。",checks:["上线检查清单：功能试过、数据迁移演练过、用户培训过、运维交接过","按真实步骤完整演练至少一次","准备退回旧系统的办法","避开客户业务高峰，提前通知相关部门","上线后头一两周安排专人值守"],tip:"已知有严重隐患的版本，宁可推迟也不上线。"},
+ {id:"s6",name:"验收收钱",when:"上线后",goal:"按约定的标准验收，验收完马上开票。",checks:["按启动会定的标准逐条过","找前期沟通过的使用部门、运维部门签字","验收时间和合同付款节点对上","验收完成，马上提醒销售开票","验收报告和签字单据留存"],tip:"验收卡住，多半是前期没跟真正签字的人沟通。"},
+ {id:"s7",name:"收尾移交",when:"验收后",goal:"客户能自己用起来，我们把经验留下来。",checks:["培训客户运维人员","交付操作手册和维护文档","交接给售后，说清以后有问题找谁","内部复盘：承诺兑现多少，人力和时间超多少","有价值的经验整理成案例分享"],tip:"书里说华为认为最大的浪费是经验的浪费，所以建了很大的案例库。"}
+];
+let done=store.get("tsj-checks",{});
+let curStep=store.get("tsj-step","s0");
+if(!STEPS.find(s=>s.id===curStep))curStep="s0";
+function count(s){return s.checks.filter((_,i)=>done[s.id+"-"+i]).length}
+function renderSteps(){
+  $("#steps").innerHTML=STEPS.map((s,i)=>{const c=count(s);return `<button class="step-btn${s.id===curStep?" on":""}" role="tab" aria-selected="${s.id===curStep}" data-s="${s.id}"><span class="no">${s.id==="s4"?"随时":String(i<4?i:i-1).padStart(2,"0")}</span><span>${s.name}</span><span class="pg${c===s.checks.length?" done":""}">${c}/${s.checks.length}</span></button>`}).join("");
+  document.querySelectorAll(".step-btn").forEach(b=>b.addEventListener("click",()=>{curStep=b.dataset.s;store.set("tsj-step",curStep);renderSteps();renderStep()}));
+}
+function renderStep(){
+  const s=STEPS.find(x=>x.id===curStep);
+  $("#stepBody").innerHTML=`<span class="when">${s.when}</span><h3>${s.name}</h3><p><b>目标：</b>${s.goal}</p>
+   ${s.rhythm?`<div style="overflow-x:auto"><table class="rhythm"><thead><tr><th>频率</th><th>做什么</th></tr></thead><tbody>${s.rhythm.map(r=>`<tr><td class="mono">${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</tbody></table></div>`:""}
+   <ul class="checks">${s.checks.map((c,i)=>{const k=s.id+"-"+i;return `<li><label for="${k}"><input type="checkbox" id="${k}" data-k="${k}"${done[k]?" checked":""}><span>${esc(c)}</span></label></li>`}).join("")}</ul>
+   <p class="tip">${esc(s.tip)}</p>
+   <button class="reset" id="resetBtn">清空本步勾选</button>`;
+  document.querySelectorAll(".checks input").forEach(i=>i.addEventListener("change",()=>{done[i.dataset.k]=i.checked;store.set("tsj-checks",done);renderSteps()}));
+  $("#resetBtn").addEventListener("click",()=>{s.checks.forEach((_,i)=>delete done[s.id+"-"+i]);store.set("tsj-checks",done);renderSteps();renderStep()});
+}
+renderSteps();renderStep();
+
+/* ---------- story ---------- */
+const POINTS=[
+ ["集中资源","各组派来的人手上还有别的活，项目经理只能\"协调\"，催不动。","三个组各派一名能拍板的骨干全职进项目；交付负责人对成员有评价权；卡了半天直接找对应组领导要人。"],
+ ["系统分开用","三个组共用一套测试系统，你更新完我又覆盖你，客户一周有三天打不开。","自己组一套、拼起来试一套、客户试用一套、正式一套。客户试用的那套每周只在固定时间更新一次。"],
+ ["持续交付","各组各自打包，最后才拼，一拼就跑不通；谁改了对接方式也不说。","同一套方法每天自动打包、检查基本功能；对接方式先写定，改之前必须通知；每周给客户演示一次。"],
+ ["对结果负责","每个组都说\"我这部分做完了\"；出了问题平台组、业务组、数据组互相推。","\"做完\"= 客户试用通过 + 上线一周无大问题 + 钱收回；问题统一一张清单不分你我；奖金一起拿或一起没有。"],
+ ["紧迫感","离上线只剩 4 周才发现问题成堆，客户打电话问\"有没有人管\"。","从 6 月 30 日倒排每个节点，每个节点写上负责人名字；每天碰头 15 分钟；客户问题当天回应。"]
+];
+let mode="after";
+function renderPoints(){
+  $("#segBefore").classList.toggle("on",mode==="before");$("#segAfter").classList.toggle("on",mode==="after");
+  $("#segBefore").setAttribute("aria-selected",mode==="before");$("#segAfter").setAttribute("aria-selected",mode==="after");
+  $("#points").innerHTML=POINTS.map(p=>`<div class="point ${mode}"><b>${p[0]}</b><p>${mode==="before"?p[1]:p[2]}</p></div>`).join("");
+  $("#timeline").hidden=mode==="before";
+}
+$("#segBefore").addEventListener("click",()=>{mode="before";renderPoints()});
+$("#segAfter").addEventListener("click",()=>{mode="after";renderPoints()});
+renderPoints();
+
+/* ---------- questions ---------- */
+const QS=["签合同或报价之前，交付和研发能不能否决销售的承诺？","销售和交付之间有没有正式的交接？交接哪些内容？","需求改动现在谁说了算？有没有评估成本、工期，有没有记录？","验收标准和付款节点在合同里绑定了吗？签验收的人我们前期接触过吗？","销售、售前、交付三方有没有共同的考核指标和奖金？","项目结束有没有复盘：承诺兑现了多少，赚了还是亏了？","我们的技术项目经理，是交付第一责任人，还是跨组协调员？"];
+$("#qs").innerHTML=QS.map(q=>`<li><span>${esc(q)}</span></li>`).join("");
+$("#copyBtn").addEventListener("click",()=>{
+  const text=QS.map((q,i)=>`${i+1}. ${q}`).join("\n");
+  const ok=()=>{$("#copyMsg").textContent="已复制"};
+  const fail=()=>{const r=document.createRange();r.selectNodeContents($("#qs"));const s=getSelection();s.removeAllRanges();s.addRange(r);$("#copyMsg").textContent="已选中，按 Ctrl/⌘+C 复制"};
+  try{navigator.clipboard.writeText(text).then(ok,fail)}catch(e){fail()}
+});
+
+/* ---------- nav highlight ---------- */
+const links=[...document.querySelectorAll(".nav a")];
+const secs=links.map(a=>document.querySelector(a.getAttribute("href")));
+if("IntersectionObserver" in window){
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id))}})},{rootMargin:"-45% 0px -50% 0px"});
+  secs.forEach(s=>s&&io.observe(s));
+}
+})();
+</script>
+</body>
+</html>
