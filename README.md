@@ -2,7 +2,10 @@
 
 《华为铁三角工作法》（范厚华，中信出版集团）的读书笔记互动版，从软件项目交付的角度用大白话整理。
 
-在线访问：https://liuchang8877.github.io/tiesanjiao-delivery/
+在线访问：
+
+- 国内：https://achang-d0gimipc60590a0f5-1256158283.tcloudbaseapp.com/tiesanjiao/
+- GitHub Pages：https://liuchang8877.github.io/tiesanjiao-delivery/
 
 ## 内容
 
